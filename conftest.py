@@ -15,3 +15,4 @@ def create_user():
     token = response.json()["accessToken"]
     yield response, payload, login_data, token
     requests.delete(f"{Urls.MAIN_URL}{Handlers.DELETE_USER}", headers={'Authorization': f'{token}'})
+

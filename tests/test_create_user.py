@@ -2,6 +2,7 @@ import pytest
 import allure
 import requests
 
+from conftest import create_user
 from data.handlers import Urls, Handlers
 from data.user_data import User
 
@@ -16,12 +17,16 @@ class TestCreateUser:
         response = requests.post(f'{Urls.MAIN_URL}{Handlers.CREATE_USER}', data=User.create_data_user())
         assert response.status_code == 200 and response.json()["success"] is True
 
-    @allure.description('создание созданого пользователя')
-    @allure.title('Создание пользователя который уже есть в системе')
-    def test_create_double_user_error(self):
-       with allure.step('Создание пользователя который уже есть в системе'): 
-        response = requests.post(f'{Urls.MAIN_URL}{Handlers.CREATE_USER}', data=User.data_double)
-        assert response.status_code == 403 and 'User already exists' in response.text
+    @allure.description('Создание созданного пользователя')
+    @allure.title('Создание пользователя, который уже есть в системе')
+    def test_create_double_user_error(self, create_user):
+     with allure.step("создание пользователя"):
+      response, payload, login_data, token = create_user
+    with allure.step('Создание пользователя, который уже есть в системе'):
+          response_double = requests.post(f'{Urls.MAIN_URL}{Handlers.CREATE_USER}', data=User.data_double)
+    assert response_double.status_code == 403
+    assert 'User already exists' in response_double.text
+
 
     @allure.description('создание пользователя с некорректыми данными')
     @allure.title('Создание пользователя с некорректными данными/ с незаполненными обязательными полями')
